@@ -37,6 +37,7 @@ export default class RepoService extends Service {
     if (!relatedRepos?.tables || relatedRepos.tables.length === 0) return null;
     result.nodes.push({ name, value: relatedRepos.tables[0].self_inf });
     relatedRepos.tables.forEach(i => {
+      if (result.nodes.findIndex(n => n.name === i.name) >= 0) return;
       result.nodes.push({
         name: i.name,
         value: i.inf,
@@ -85,6 +86,7 @@ export default class RepoService extends Service {
     const relatedActors = await this.service.nebula.exec<{ tables: RelatedDevelopers[] }>(`MATCH (n:repo{repo_name:"${name}"})<-[rel:relationship]-(r:actor) WITH rel.weight AS w, r.actor_login AS name RETURN name, w ORDER BY w DESC LIMIT 30`);
     if (!relatedActors?.tables || relatedActors.tables.length === 0) return null;
     relatedActors.tables.forEach(i => {
+      if (result.nodes.findIndex(n => n.name === i.name) >= 0) return;
       result.nodes.push({
         name: i.name,
         value: i.w,
