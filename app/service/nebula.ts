@@ -17,10 +17,12 @@ import requestretry from 'requestretry';
 
 export default class NebulaService extends Service {
 
+  private nsid: string;
+
   public async exec<T>(q: string): Promise<T | null> {
     try {
-      const nsid = await this.getNSID();
-      const result = await this.execInternal(nsid, q);
+      await this.initNSID();
+      const result = await this.execInternal(q);
       return result;
     } catch (e) {
       this.logger.info(`Error while exec gql, q=${q}, err=${e}`);
@@ -28,13 +30,13 @@ export default class NebulaService extends Service {
     }
   }
 
-  private async execInternal(nsid: string, q: string): Promise<any> {
+  private async execInternal(q: string): Promise<any> {
     return new Promise((resolve, reject) => {
       const config = this.app.config.nebula;
       const options = {
         url: config.gateway + 'exec',
         headers: {
-          Cookie: `SameSite=None; ${config.nsidKey}=${nsid}`,
+          Cookie: `SameSite=None; ${config.nsidKey}=${this.nsid}`,
         },
         json: {
           gql: q,
@@ -53,14 +55,12 @@ export default class NebulaService extends Service {
     });
   }
 
-  private async getNSID(): Promise<string> {
+  private async initNSID(): Promise<void> {
     return new Promise((resolve, reject) => {
-      const config = this.app.config.nebula;
-      const nsidKey = this.app.cache.get<string>(config.nsidKey);
-      if (nsidKey) {
-        return resolve(nsidKey);
+      if (this.nsid) {
+        return;
       }
-
+      const config = this.app.config.nebula;
       const options = {
         url: config.gateway + 'connect',
         json: {
@@ -82,8 +82,8 @@ export default class NebulaService extends Service {
         if (!cookieMap.has(config.nsidKey)) {
           return reject(`NSID not included in response, cookies=${JSON.stringify(cookies)}`);
         }
-        this.app.cache.set(config.nsidKey, cookieMap.get(config.nsidKey));
-        resolve(cookieMap.get(config.nsidKey)!);
+        this.nsid = cookieMap.get(config.nsidKey)!;
+        resolve();
       });
     });
   }
