@@ -32,7 +32,7 @@ export default class RepoController extends Controller {
     result.forEach(item => {
       resultObj[item.Name] = item.Count;
     });
-
+    this.service.nebula.close();
     this.ctx.body = {
       repo: resultObj.repo,
       actor: resultObj.actor,
@@ -45,6 +45,7 @@ export default class RepoController extends Controller {
     const { owner, repo } = this.ctx.params;
     const repoName = `${owner}/${repo}`;
     const result = await this.service.repo.getRepoNetwork(repoName);
+    this.service.nebula.close();
     if (!result) {
       this.ctx.body = { error: 'No valid data' };
       return;
@@ -56,6 +57,7 @@ export default class RepoController extends Controller {
     const { owner, repo } = this.ctx.params;
     const repoName = `${owner}/${repo}`;
     const result = await this.service.repo.getDeveloperNetwork(repoName);
+    this.service.nebula.close();
     if (!result) {
       this.ctx.body = { error: 'No valid data' };
       return;

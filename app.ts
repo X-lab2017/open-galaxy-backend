@@ -27,8 +27,9 @@ class Cache {
 
   public all() {
     const obj: any = {};
-    Array.from(this.map.entries()).forEach(v => {
-      obj[v[0]] = v[1];
+    Array.from(this.map.entries()).forEach(v => obj[v[0]] = {
+      nodes: v[1].nodes.length,
+      edges: v[1].edges.length,
     });
     return obj;
   }
@@ -48,7 +49,4 @@ export default class AppBootHook {
     // await this.app.createAnonymousContext().service.nebula.init();
   }
 
-  public async beforeClose() {
-    await this.app.createAnonymousContext().service.nebula.close();
-  }
 }

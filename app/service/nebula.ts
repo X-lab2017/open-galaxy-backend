@@ -57,8 +57,8 @@ export default class NebulaService extends Service {
 
   private async initNSID(): Promise<void> {
     return new Promise((resolve, reject) => {
-      if (this.nsid) {
-        return;
+      if (this.nsid && this.nsid !== '') {
+        return resolve();
       }
       const config = this.app.config.nebula;
       const options = {
@@ -89,17 +89,16 @@ export default class NebulaService extends Service {
   }
 
   public close() {
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
       const config = this.app.config.nebula;
-      const nsid = this.app.cache.get<string>(config.nsidKey);
-      if (!nsid) {
-        return;
+      if (!this.nsid) {
+        return resolve();
       }
 
       const options = {
         url: config.gateway + 'disconnect',
         headers: {
-          Cookie: `SameSite=None; ${config.nsidKey}=${nsid}`,
+          Cookie: `SameSite=None; ${config.nsidKey}=${this.nsid}`,
         },
       };
       requestretry.post(options, resolve);
