@@ -5,6 +5,7 @@ declare module 'egg' {
     cache: {
       set: (key: string, value: any) => void,
       get: <T>(key: string) => T | undefined,
+      all: () => any,
     }
   }
 }

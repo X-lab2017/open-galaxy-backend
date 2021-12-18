@@ -24,6 +24,14 @@ class Cache {
   public get<T>(key: string): T | undefined {
     return this.map.get(key);
   }
+
+  public all() {
+    const obj: any = {};
+    Array.from(this.map.entries()).forEach(v => {
+      obj[v[0]] = v[1];
+    });
+    return obj;
+  }
 }
 
 export default class AppBootHook {

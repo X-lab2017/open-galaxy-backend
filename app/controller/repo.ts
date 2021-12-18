@@ -37,6 +37,7 @@ export default class RepoController extends Controller {
       repo: resultObj.repo,
       actor: resultObj.actor,
       relationship: resultObj.relationship,
+      cache: this.app.cache.all(),
     };
   }
 
