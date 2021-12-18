@@ -12,10 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { EggAppConfig, PowerPartial } from 'egg';
+import { Context, EggAppConfig, PowerPartial } from 'egg';
 
 export default () => {
   const config = {} as PowerPartial<EggAppConfig>;
+
+  config.keys = 'Something';
+
+  config.security = {
+    csrf: {
+      enable: false,
+      ignoreJSON: true,
+    },
+  };
+
+  config.cors = {
+    origin: (ctx: Context) => ctx.get('origin'),
+    allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH',
+  };
 
   config.nebula = {
     gateway: 'http://127.0.0.1:8080/api/db/',
